@@ -1,0 +1,161 @@
+[gd_scene format=3 uid="uid://ci2by6m8xpkxe"]
+
+[ext_resource type="PackedScene" uid="uid://cslibvx3tgmad" path="res://src/model/gate.tscn" id="1_qf7nk"]
+[ext_resource type="Script" uid="uid://siq8wqd2nvaf" path="res://src/model/main_base.gd" id="2_4go5o"]
+[ext_resource type="Texture2D" uid="uid://ck4dj4g8ex8pa" path="res://assets/plane.jpeg" id="2_rto0b"]
+[ext_resource type="PackedScene" uid="uid://bc10isfsi6eyh" path="res://src/model/wall.tscn" id="4_n3a2o"]
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_n3a2o"]
+vertices = PackedVector2Array(102.75, 186, 98, 210.50781, 98, 205, -304.9922, 165, -705.09375, -2.6875, -712.84375, -519.8672, 725.47656, -502.1172, 700.3281, -8.8125, 313.47656, 151.65625, -301.0703, 165, 294.71875, 183, 239, 183, 92.86719, 448.9375, -82.90625, 447.04688, -170.89063, 328.2422, -125.52344, 295.95313, 123.546875, 292.59375, 169.13281, 341.8203, -105.28125, 186, -239, 186, -239, 182, 239, 185.3125, 135.92969, 186, -98.84375, 245.10156, -98.71094, 235, -21, 235, -98.9375, 252.20313, 18, 235, -21, 205, -100.296875, 205, 97.63281, 235, 18, 205, -290.78125, 182)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2), PackedInt32Array(3, 4, 5, 6, 7, 8, 9), PackedInt32Array(9, 8, 10, 11), PackedInt32Array(12, 13, 14, 15, 16, 17), PackedInt32Array(18, 19, 20), PackedInt32Array(9, 11, 21, 22, 0), PackedInt32Array(9, 0, 2, 18), PackedInt32Array(23, 24, 25), PackedInt32Array(16, 26, 23, 25, 27), PackedInt32Array(16, 15, 26), PackedInt32Array(28, 29, 18), PackedInt32Array(27, 30, 16), PackedInt32Array(31, 27, 25, 28), PackedInt32Array(20, 32, 9), PackedInt32Array(18, 20, 9), PackedInt32Array(18, 2, 31), PackedInt32Array(18, 31, 28)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-721, -509, -638.3744, -508.94266, 720, -508, 295, 202, 288, 195, 136, 196, 111, 196, 105, 227, 132, 287, 182, 341, 98, 459, -88, 457, -185, 326, -133, 289, -102, 238, -113, 196, -294, 196), PackedVector2Array(-108, 179, 110, 178, 103, 254, -109, 257, -108.97921, 255.37784, -108.845764, 244.96992), PackedVector2Array(-100, 249, 96, 247, 116, 287, 155, 337, 124, 359, 52, 359, -79, 359, -113, 312), PackedVector2Array(-307, 175, -715, 4, -723, -530, 736, -512, 710, -2, 305, 166, 288, 190)])
+parsed_collision_mask = 4294967279
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rto0b"]
+size = Vector2(44, 44)
+
+[node name="World" type="Node2D" unique_id=720116892]
+position = Vector2(722, 511)
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="." unique_id=1179529627]
+position = Vector2(-9, 0)
+navigation_polygon = SubResource("NavigationPolygon_n3a2o")
+
+[node name="Gate" parent="NavigationRegion2D" unique_id=2071975084 groups=["gate"] instance=ExtResource("1_qf7nk")]
+z_index = 1
+position = Vector2(1, 200)
+rotation = 1.5707964
+collision_layer = 16
+metadata/_edit_lock_ = true
+
+[node name="Gate2" parent="NavigationRegion2D" unique_id=669794754 groups=["gate"] instance=ExtResource("1_qf7nk")]
+z_index = 1
+position = Vector2(120, 200)
+rotation = 1.5707964
+collision_layer = 16
+metadata/_edit_lock_ = true
+
+[node name="Map" type="Sprite2D" parent="NavigationRegion2D" unique_id=2052302571]
+z_index = -1
+scale = Vector2(3, 3)
+texture = ExtResource("2_rto0b")
+metadata/_edit_lock_ = true
+
+[node name="MainBase" type="Area2D" parent="NavigationRegion2D" unique_id=1178174166]
+collision_layer = 8
+collision_mask = 4
+script = ExtResource("2_4go5o")
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NavigationRegion2D/MainBase" unique_id=1922439321]
+position = Vector2(0, 420)
+shape = SubResource("RectangleShape2D_rto0b")
+
+[node name="ColorRect" type="ColorRect" parent="NavigationRegion2D/MainBase" unique_id=1549902836]
+offset_left = -20.0
+offset_top = 400.0
+offset_right = 20.0
+offset_bottom = 440.0
+color = Color(0, 0.28235295, 1, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="ArcherSlots" type="Node2D" parent="NavigationRegion2D" unique_id=46857944]
+metadata/_edit_lock_ = true
+
+[node name="Slot1" type="Marker2D" parent="NavigationRegion2D/ArcherSlots" unique_id=1613045255]
+position = Vector2(168, 221)
+
+[node name="ColorRect" type="ColorRect" parent="NavigationRegion2D/ArcherSlots/Slot1" unique_id=1045547972]
+z_index = 2
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+metadata/_edit_use_anchors_ = true
+
+[node name="Slot2" type="Marker2D" parent="NavigationRegion2D/ArcherSlots" unique_id=1221477207]
+position = Vector2(261, 221)
+
+[node name="ColorRect" type="ColorRect" parent="NavigationRegion2D/ArcherSlots/Slot2" unique_id=877139268]
+z_index = 2
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+metadata/_edit_use_anchors_ = true
+
+[node name="Slot3" type="Marker2D" parent="NavigationRegion2D/ArcherSlots" unique_id=1087480503]
+position = Vector2(-182, 218)
+
+[node name="ColorRect" type="ColorRect" parent="NavigationRegion2D/ArcherSlots/Slot3" unique_id=2086981543]
+z_index = 2
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+metadata/_edit_use_anchors_ = true
+
+[node name="Slot4" type="Marker2D" parent="NavigationRegion2D/ArcherSlots" unique_id=1809992176]
+position = Vector2(-270, 219)
+
+[node name="ColorRect" type="ColorRect" parent="NavigationRegion2D/ArcherSlots/Slot4" unique_id=826579242]
+z_index = 2
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+metadata/_edit_use_anchors_ = true
+
+[node name="WallFront" parent="NavigationRegion2D" unique_id=1822063255 instance=ExtResource("4_n3a2o")]
+position = Vector2(-200, 220)
+scale = Vector2(4, 1)
+collision_mask = 0
+metadata/_edit_lock_ = true
+
+[node name="WallFront2" parent="NavigationRegion2D" unique_id=373639121 instance=ExtResource("4_n3a2o")]
+position = Vector2(200, 220)
+scale = Vector2(4, 1)
+collision_mask = 0
+metadata/_edit_lock_ = true
+
+[node name="WallLeft" parent="NavigationRegion2D" unique_id=2135172963 instance=ExtResource("4_n3a2o")]
+position = Vector2(-270, 360)
+scale = Vector2(1, 8)
+collision_mask = 0
+metadata/_edit_lock_ = true
+
+[node name="WallRight" parent="NavigationRegion2D" unique_id=633222086 instance=ExtResource("4_n3a2o")]
+position = Vector2(270, 361)
+scale = Vector2(1, 8)
+collision_mask = 0
+metadata/_edit_lock_ = true
+
+[node name="WallBottom" parent="NavigationRegion2D" unique_id=671013699 instance=ExtResource("4_n3a2o")]
+position = Vector2(0, 490)
+rotation = 1.5707964
+scale = Vector2(1, 13.6)
+collision_mask = 0
+metadata/_edit_lock_ = true
+
+[node name="Spawners" type="Node2D" parent="." unique_id=641588837]
+position = Vector2(202, 336)
+
+[node name="EnemySpawner" type="Marker2D" parent="Spawners" unique_id=1535824469]
+position = Vector2(386, -399)
+
+[node name="EnemySpawner2" type="Marker2D" parent="Spawners" unique_id=416095397]
+position = Vector2(309, -596)
+
+[node name="EnemySpawner3" type="Marker2D" parent="Spawners" unique_id=1966627886]
+position = Vector2(-18, -769)
+
+[node name="EnemySpawner4" type="Marker2D" parent="Spawners" unique_id=1926199357]
+position = Vector2(-412, -773)
+
+[node name="EnemySpawner5" type="Marker2D" parent="Spawners" unique_id=575872260]
+position = Vector2(-723, -627)
+
+[node name="EnemySpawner6" type="Marker2D" parent="Spawners" unique_id=2069496392]
+position = Vector2(-789, -387)
+
+[node name="Units" type="Node2D" parent="." unique_id=1703124878]

@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://cqgpocp6kledv"]
+
+[ext_resource type="Script" uid="uid://dovyw7pjqb5ab" path="res://src/core/game_manager.gd" id="1_emcv1"]
+
+[node name="GameManager" type="Node" unique_id=372747516]
+script = ExtResource("1_emcv1")
+
+[node name="PhaseTimer" type="Timer" parent="." unique_id=1831739619]
+
+[connection signal="money_changed" from="." to="." method="_on_money_changed"]
+[connection signal="phase_changed" from="." to="." method="_on_phase_changed"]
+[connection signal="timeout" from="PhaseTimer" to="." method="_on_phase_timer_timeout"]

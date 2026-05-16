@@ -1,0 +1,86 @@
+[gd_resource type="Resource" script_class="UnitConfig" format=3 uid="uid://dxg76h7mv7vbe"]
+
+[ext_resource type="Script" uid="uid://m321qyllhswu" path="res://data/unit_config.gd" id="1"]
+[ext_resource type="Script" uid="uid://b6dani5o2wai6" path="res://data/unit_params.gd" id="2"]
+[ext_resource type="Script" uid="uid://cdpaprxo0o143" path="res://data/archer_params.gd" id="3"]
+[ext_resource type="Script" uid="uid://fmrd22twlmag" path="res://data/summoner_params.gd" id="4"]
+
+[sub_resource type="Resource" id="ally_archer"]
+script = ExtResource("3")
+cost = 30
+max_hp = 60
+speed = 0.0
+damage = 20
+attack_range = 200.0
+attack_interval = 2.0
+
+[sub_resource type="Resource" id="ally_attacker"]
+script = ExtResource("2")
+cost = 20
+max_hp = 80
+speed = 10.0
+damage = 15
+attack_range = 60.0
+attack_interval = 0.8
+
+[sub_resource type="Resource" id="ally_tank"]
+script = ExtResource("2")
+cost = 30
+max_hp = 150
+speed = 5.0
+damage = 8
+attack_range = 50.0
+attack_interval = 1.5
+
+[sub_resource type="Resource" id="enemy_breaker"]
+script = ExtResource("2")
+max_hp = 120
+speed = 55.0
+damage = 25
+attack_range = 50.0
+attack_interval = 3.0
+reward = 15
+gate_damage_multiplier = 3.0
+
+[sub_resource type="Resource" id="enemy_dash"]
+script = ExtResource("2")
+max_hp = 70
+speed = 180.0
+attack_interval = 0.8
+reward = 6
+
+[sub_resource type="Resource" id="enemy_heavy"]
+script = ExtResource("2")
+max_hp = 200
+speed = 50.0
+damage = 20
+attack_range = 50.0
+attack_interval = 2.0
+reward = 10
+
+[sub_resource type="Resource" id="enemy_summoner"]
+script = ExtResource("4")
+speed = 55.0
+damage = 0
+attack_range = 0.0
+attack_interval = 99.0
+reward = 20
+
+[sub_resource type="Resource" id="enemy_swarm"]
+script = ExtResource("2")
+max_hp = 25
+speed = 150.0
+damage = 5
+attack_interval = 0.5
+reward = 3
+
+[resource]
+script = ExtResource("1")
+ally_attacker = SubResource("ally_attacker")
+ally_tank = SubResource("ally_tank")
+ally_archer = SubResource("ally_archer")
+enemy_heavy = SubResource("enemy_heavy")
+enemy_swarm = SubResource("enemy_swarm")
+enemy_dash = SubResource("enemy_dash")
+enemy_breaker = SubResource("enemy_breaker")
+enemy_summoner = SubResource("enemy_summoner")

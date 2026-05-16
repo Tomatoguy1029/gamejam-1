@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://dd1bi2m6nb2nk"]
+
+[ext_resource type="Script" uid="uid://df277n7ubh0aw" path="res://src/units/enemy/enemy_base.gd" id="1_ik3cd"]
+[ext_resource type="LabelSettings" uid="uid://b1cltswhroxdo" path="res://src/mat/attack_label.tres" id="2_u68ta"]
+
+[sub_resource type="RectangleShape2D" id="RectShape_heavy"]
+size = Vector2(42, 41)
+
+[node name="EnemyHeavy" type="CharacterBody2D" unique_id=1772933990 groups=["enemies"]]
+scale = Vector2(1, 2)
+collision_layer = 4
+collision_mask = 27
+script = ExtResource("1_ik3cd")
+unit_id = "enemy_heavy"
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=463906072]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1434919248]
+position = Vector2(20, 20)
+shape = SubResource("RectShape_heavy")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="." unique_id=1634118570]
+
+[node name="AttackTimer" type="Timer" parent="." unique_id=1960688495]
+one_shot = true
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1497410305]
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.30876935, 0.30876938, 0.30876935, 1)
+
+[node name="Label" type="Label" parent="." unique_id=1071667236]
+offset_top = 8.0
+offset_right = 40.0
+offset_bottom = 31.0
+label_settings = ExtResource("2_u68ta")
+horizontal_alignment = 1
+vertical_alignment = 1

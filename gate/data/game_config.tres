@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="GameConfig" format=3 uid="uid://ch2k8fu2ujeyd"]
+
+[ext_resource type="Script" uid="uid://bo3kmtal73n2l" path="res://data/game_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+initial_money = 150
+phase_clear_reward = 40
+upgrade_cost = 20
+placement_bounds = Rect2(460, 740, 520, 255)

@@ -1,0 +1,68 @@
+[gd_scene format=3 uid="uid://b8wta4plwg7b4"]
+
+[ext_resource type="Script" uid="uid://jufsxdbpbgj4" path="res://src/ui/phase_message.gd" id="1_pm"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_qqn4i"]
+font_size = 60
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_uqueh"]
+font_size = 30
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="InputEventAction" id="InputEventAction_6k1am"]
+action = &"start_game"
+
+[sub_resource type="Shortcut" id="Shortcut_26ovk"]
+events = [SubResource("InputEventAction_6k1am")]
+
+[node name="PhaseMessage" type="Control" unique_id=400000001]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_pm")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=400000002]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -419.5
+offset_top = -317.0
+offset_right = 420.5
+offset_bottom = -173.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+metadata/_edit_group_ = true
+
+[node name="MainLabel" type="Label" parent="VBox" unique_id=400000003]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+label_settings = SubResource("LabelSettings_qqn4i")
+horizontal_alignment = 1
+
+[node name="HintLabel" type="Label" parent="VBox" unique_id=400000004]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+label_settings = SubResource("LabelSettings_uqueh")
+horizontal_alignment = 1
+
+[node name="RetryButton" type="Button" parent="VBox" unique_id=400000006]
+visible = false
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+shortcut = SubResource("Shortcut_26ovk")
+text = "↩  RETRY"
+
+[node name="HideTimer" type="Timer" parent="." unique_id=400000005]
+one_shot = true
+
+[connection signal="timeout" from="HideTimer" to="." method="_on_hide_timer_timeout"]

@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://dyo0eht68ilww"]
+
+[ext_resource type="Script" uid="uid://bsi25wql0j50" path="res://src/model/gate.gd" id="1_or0ff"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_or0ff"]
+size = Vector2(41, 40)
+
+[node name="MainBase" type="StaticBody2D" unique_id=669794754]
+collision_mask = 0
+script = ExtResource("1_or0ff")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1054775538]
+position = Vector2(20.5, 20)
+shape = SubResource("RectangleShape2D_or0ff")
+disabled = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1970065535]
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1873023487]
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.24313726, 0.22352941, 1, 1)

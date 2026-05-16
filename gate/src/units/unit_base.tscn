@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://jq77vyp75ei2"]
+
+[ext_resource type="LabelSettings" uid="uid://b1cltswhroxdo" path="res://src/mat/attack_label.tres" id="ls_atk"]
+
+[node name="UnitBase" type="CharacterBody2D" unique_id=1350785340]
+collision_layer = 2
+collision_mask = 5
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1367614607]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1873157201]
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="." unique_id=798380595]
+
+[node name="DetectionArea" type="Area2D" parent="." unique_id=184035077]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=500904144]
+
+[node name="AttackTimer" type="Timer" parent="." unique_id=1400907231]
+
+[node name="Label" type="Label" parent="." unique_id=3001000009]
+offset_top = 8.0
+offset_right = 40.0
+offset_bottom = 31.0
+label_settings = ExtResource("ls_atk")
+horizontal_alignment = 1
+vertical_alignment = 1

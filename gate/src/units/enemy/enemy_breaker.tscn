@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://bkjm8bniatbno"]
+
+[ext_resource type="Script" uid="uid://d3jdx1j4urbj4" path="res://src/units/enemy/enemy_breaker.gd" id="1_4mb6k"]
+[ext_resource type="LabelSettings" uid="uid://b1cltswhroxdo" path="res://src/mat/attack_label.tres" id="2_lhjsb"]
+
+[sub_resource type="RectangleShape2D" id="RectShape_breaker"]
+size = Vector2(42, 41)
+
+[node name="EnemyBreaker" type="CharacterBody2D" unique_id=1772933990 groups=["enemies"]]
+scale = Vector2(1, 2)
+collision_layer = 4
+collision_mask = 27
+script = ExtResource("1_4mb6k")
+unit_id = "enemy_breaker"
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=894232227]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=586534959]
+position = Vector2(20, 20)
+shape = SubResource("RectShape_breaker")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="." unique_id=29862795]
+
+[node name="AttackTimer" type="Timer" parent="." unique_id=802560971]
+one_shot = true
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=2054399651]
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.62352943, 0, 0.05882353, 1)
+
+[node name="Label" type="Label" parent="." unique_id=376754122]
+offset_top = 8.0
+offset_right = 40.0
+offset_bottom = 31.0
+label_settings = ExtResource("2_lhjsb")
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://cbdiq6b0ouuyk"]
+
+[ext_resource type="Script" uid="uid://cw6ixjpijgxej" path="res://src/units/ally/ally_base.gd" id="1_2p0ei"]
+[ext_resource type="LabelSettings" uid="uid://b1cltswhroxdo" path="res://src/mat/attack_label.tres" id="2_53xss"]
+
+[sub_resource type="RectangleShape2D" id="RectShape_tank"]
+size = Vector2(42, 42)
+
+[node name="AllyTank" type="CharacterBody2D" unique_id=360973355 groups=["allies"]]
+collision_layer = 2
+collision_mask = 21
+script = ExtResource("1_2p0ei")
+unit_id = "ally_tank"
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1401632128]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=45175180]
+position = Vector2(20, 20)
+shape = SubResource("RectShape_tank")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="." unique_id=2135751425]
+
+[node name="AttackTimer" type="Timer" parent="." unique_id=1596360504]
+one_shot = true
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1766849465]
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.5921569, 0.4392157, 1, 1)
+
+[node name="Label" type="Label" parent="." unique_id=1394592510]
+offset_top = 8.0
+offset_right = 40.0
+offset_bottom = 31.0
+label_settings = ExtResource("2_53xss")
+horizontal_alignment = 1
+vertical_alignment = 1

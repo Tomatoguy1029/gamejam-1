@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://25v4d742582g"]
+
+[ext_resource type="Script" uid="uid://d3wgvof1f2an1" path="res://src/units/enemy/enemy_summoner.gd" id="1_iwegk"]
+[ext_resource type="PackedScene" uid="uid://b48aoehukbsc6" path="res://src/units/enemy/enemy_swarm.tscn" id="2_lxgto"]
+[ext_resource type="LabelSettings" uid="uid://b1cltswhroxdo" path="res://src/mat/attack_label.tres" id="3_b4hmv"]
+
+[sub_resource type="RectangleShape2D" id="RectShape_summoner"]
+size = Vector2(42, 41)
+
+[node name="EnemySummoner" type="CharacterBody2D" unique_id=1772933990 groups=["enemies"]]
+scale = Vector2(1, 2)
+collision_layer = 4
+collision_mask = 27
+script = ExtResource("1_iwegk")
+swarm_scene = ExtResource("2_lxgto")
+unit_id = "enemy_summoner"
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=183695881]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=732864316]
+position = Vector2(20, 20)
+shape = SubResource("RectShape_summoner")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="." unique_id=1756717645]
+
+[node name="AttackTimer" type="Timer" parent="." unique_id=1085792377]
+one_shot = true
+
+[node name="SummonTimer" type="Timer" parent="." unique_id=1082796043]
+autostart = true
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1929328468]
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(1, 0.06666667, 0.8784314, 1)
+
+[node name="Label" type="Label" parent="." unique_id=961892684]
+offset_top = 8.0
+offset_right = 40.0
+offset_bottom = 31.0
+label_settings = ExtResource("3_b4hmv")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="timeout" from="SummonTimer" to="." method="_on_summon_timer_timeout"]
