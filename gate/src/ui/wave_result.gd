@@ -21,13 +21,10 @@ func _ready():
 	_next_button.pressed.connect(_on_next_pressed)
 	hide()
 
-# ---- 公開 API ----
-
 ## survivors: { unit_id -> { "count": int, "reward": int } }
 func show_result(wave_num: int, survivors: Dictionary, total_reward: int) -> void:
 	_title_label.text = "WAVE %d  CLEAR!" % wave_num
 
-	# 行をクリア
 	for child in _rows_box.get_children():
 		child.queue_free()
 
@@ -43,8 +40,6 @@ func show_result(wave_num: int, survivors: Dictionary, total_reward: int) -> voi
 
 	_total_label.text = "生存ボーナス合計   +%dG" % total_reward
 	show()
-
-# ---- 内部 ----
 
 func _add_row(label: String, rate: String, subtotal: String) -> void:
 	var hbox := HBoxContainer.new()

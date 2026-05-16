@@ -1,49 +1,49 @@
 [
   {
-    "phase": 1,
-    "comment": "重装型・群れ型",
-    "groups": [
-      { "scene": "res://src/units/enemy/enemy_heavy.tscn",   "count": 3,  "interval": 2.0, "start_delay": 0.0 },
-      { "scene": "res://src/units/enemy/enemy_swarm.tscn",   "count": 8,  "interval": 0.4, "start_delay": 8.0 }
-    ]
+	"phase": 1,
+	"comment": "重装型・群れ型",
+	"groups": [
+	  { "scene": "res://src/units/enemy/enemy_heavy.tscn",   "count": 3,  "interval": 2.0, "start_delay": 0.0 },
+	  { "scene": "res://src/units/enemy/enemy_swarm.tscn",   "count": 8,  "interval": 0.4, "start_delay": 8.0 }
+	]
   },
   {
-    "phase": 2,
-    "comment": "重装型・門破壊特化型・群れ型",
-    "groups": [
-      { "scene": "res://src/units/enemy/enemy_heavy.tscn",   "count": 4,  "interval": 2.0, "start_delay": 0.0 },
-      { "scene": "res://src/units/enemy/enemy_breaker.tscn", "count": 2,  "interval": 3.0, "start_delay": 5.0 },
-      { "scene": "res://src/units/enemy/enemy_swarm.tscn",   "count": 10, "interval": 0.3, "start_delay": 12.0 }
-    ]
+	"phase": 2,
+	"comment": "重装型・門破壊特化型・群れ型",
+	"groups": [
+	  { "scene": "res://src/units/enemy/enemy_heavy.tscn",   "count": 4,  "interval": 2.0, "start_delay": 0.0 },
+	  { "scene": "res://src/units/enemy/enemy_breaker.tscn", "count": 2,  "interval": 3.0, "start_delay": 5.0 },
+	  { "scene": "res://src/units/enemy/enemy_swarm.tscn",   "count": 10, "interval": 0.3, "start_delay": 12.0 }
+	]
   },
   {
-    "phase": 3,
-    "comment": "突進型・門破壊特化型・群れ型",
-    "groups": [
-      { "scene": "res://src/units/enemy/enemy_dash.tscn",    "count": 4,  "interval": 1.5, "start_delay": 0.0 },
-      { "scene": "res://src/units/enemy/enemy_breaker.tscn", "count": 3,  "interval": 2.5, "start_delay": 6.0 },
-      { "scene": "res://src/units/enemy/enemy_swarm.tscn",   "count": 12, "interval": 0.3, "start_delay": 14.0 }
-    ]
+	"phase": 3,
+	"comment": "突進型・門破壊特化型・群れ型",
+	"groups": [
+	  { "scene": "res://src/units/enemy/enemy_dash.tscn",    "count": 4,  "interval": 1.5, "start_delay": 0.0 },
+	  { "scene": "res://src/units/enemy/enemy_breaker.tscn", "count": 3,  "interval": 2.5, "start_delay": 6.0 },
+	  { "scene": "res://src/units/enemy/enemy_swarm.tscn",   "count": 12, "interval": 0.3, "start_delay": 14.0 }
+	]
   },
   {
-    "phase": 4,
-    "comment": "突進型・重装型・召喚型・群れ型",
-    "groups": [
-      { "scene": "res://src/units/enemy/enemy_dash.tscn",      "count": 5,  "interval": 1.5, "start_delay": 0.0 },
-      { "scene": "res://src/units/enemy/enemy_heavy.tscn",     "count": 4,  "interval": 2.0, "start_delay": 4.0 },
-      { "scene": "res://src/units/enemy/enemy_summoner.tscn",  "count": 2,  "interval": 5.0, "start_delay": 10.0 },
-      { "scene": "res://src/units/enemy/enemy_swarm.tscn",     "count": 8,  "interval": 0.4, "start_delay": 16.0 }
-    ]
+	"phase": 4,
+	"comment": "突進型・重装型・召喚型・群れ型",
+	"groups": [
+	  { "scene": "res://src/units/enemy/enemy_dash.tscn",      "count": 5,  "interval": 1.5, "start_delay": 0.0 },
+	  { "scene": "res://src/units/enemy/enemy_heavy.tscn",     "count": 4,  "interval": 2.0, "start_delay": 4.0 },
+	  { "scene": "res://src/units/enemy/enemy_summoner.tscn",  "count": 2,  "interval": 5.0, "start_delay": 10.0 },
+	  { "scene": "res://src/units/enemy/enemy_swarm.tscn",     "count": 8,  "interval": 0.4, "start_delay": 16.0 }
+	]
   },
   {
-    "phase": 5,
-    "comment": "混合ウェーブ",
-    "groups": [
-      { "scene": "res://src/units/enemy/enemy_heavy.tscn",     "count": 5,  "interval": 1.5, "start_delay": 0.0 },
-      { "scene": "res://src/units/enemy/enemy_dash.tscn",      "count": 6,  "interval": 1.0, "start_delay": 3.0 },
-      { "scene": "res://src/units/enemy/enemy_breaker.tscn",   "count": 4,  "interval": 2.0, "start_delay": 8.0 },
-      { "scene": "res://src/units/enemy/enemy_summoner.tscn",  "count": 2,  "interval": 4.0, "start_delay": 12.0 },
-      { "scene": "res://src/units/enemy/enemy_swarm.tscn",     "count": 15, "interval": 0.25, "start_delay": 18.0 }
-    ]
+	"phase": 5,
+	"comment": "混合ウェーブ",
+	"groups": [
+	  { "scene": "res://src/units/enemy/enemy_heavy.tscn",     "count": 5,  "interval": 1.5, "start_delay": 0.0 },
+	  { "scene": "res://src/units/enemy/enemy_dash.tscn",      "count": 6,  "interval": 1.0, "start_delay": 3.0 },
+	  { "scene": "res://src/units/enemy/enemy_breaker.tscn",   "count": 4,  "interval": 2.0, "start_delay": 8.0 },
+	  { "scene": "res://src/units/enemy/enemy_summoner.tscn",  "count": 2,  "interval": 4.0, "start_delay": 12.0 },
+	  { "scene": "res://src/units/enemy/enemy_swarm.tscn",     "count": 15, "interval": 0.25, "start_delay": 18.0 }
+	]
   }
 ]
