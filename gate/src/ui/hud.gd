@@ -17,6 +17,13 @@ func _ready():
 	fill_style.bg_color = Color(0.55, 0.9, 0.15, 1.0)
 	hp_bar.add_theme_stylebox_override("fill", fill_style)
 
+	# タイトルに戻るボタン
+	var title_btn := Button.new()
+	title_btn.text = "タイトル"
+	title_btn.custom_minimum_size = Vector2(100, 50)
+	$HBoxContainer2/HBoxContainer.add_child(title_btn)
+	title_btn.pressed.connect(_on_title_pressed)
+
 func _on_phase_changed(new_phase):
 	phase_label.text = "DEFENSE" if new_phase == GameManager.Phase.DEFENDING else "PREPARE"
 
@@ -25,6 +32,10 @@ func _on_money_changed(amount):
 
 func _on_hp_changed(hp):
 	hp_bar.value = hp
+
+func _on_title_pressed() -> void:
+	GameManager.reset()
+	get_tree().reload_current_scene()
 
 func _process(_delta):
 	time_label.text = str(int(GameManager.get_phase_time_left()))

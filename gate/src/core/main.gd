@@ -12,6 +12,10 @@ var _occupied_slots: Dictionary = {}
 
 var _wave_configs: Array = []
 
+# 敵全滅検知用
+var _all_enemies_spawned: bool = false
+var _remaining_to_spawn:  int  = 0
+
 @onready var units_node: Node2D   = $World/Units
 @onready var spawners: Node2D     = $World/Spawners
 @onready var archer_slots: Node2D = $World/NavigationRegion2D/ArcherSlots
@@ -35,7 +39,18 @@ func _load_wave_configs():
 		return
 	_wave_configs = json.get_data()
 
+func _process(_delta):
+	if GameManager.current_phase == GameManager.Phase.DEFENDING \
+			and _all_enemies_spawned \
+			and get_tree().get_nodes_in_group("enemies").is_empty():
+		GameManager.start_placing_phase()
+
 func _input(event):
+	# ESC でタイトルに戻る（任意フェーズ）
+	if event.is_action_pressed("ui_cancel"):
+		_return_to_title()
+		return
+
 	if GameManager.current_phase != GameManager.Phase.PLACING:
 		return
 
@@ -95,8 +110,14 @@ func _find_free_slot() -> Marker2D:
 				return slot
 	return null
 
+func _return_to_title() -> void:
+	GameManager.reset()
+	get_tree().reload_current_scene()
+
 func _on_phase_changed(new_phase):
 	if new_phase == GameManager.Phase.DEFENDING:
+		_all_enemies_spawned = false
+		_remaining_to_spawn  = 0
 		_spawn_wave(GameManager.wave_count - 1)
 	elif new_phase == GameManager.Phase.PLACING:
 		# 敵を全て削除
@@ -128,8 +149,9 @@ func _show_wave_result() -> void:
 		ally.queue_free()
 	_occupied_slots.clear()
 
-	# リザルト画面を表示
-	_wave_result.show_result(GameManager.wave_count, survivors, total_reward)
+	# リザルト画面を表示（waveクリア報酬は GameManager が自動付与）
+	_wave_result.show_result(GameManager.wave_count, survivors, total_reward,
+			GameManager.CONFIG.phase_clear_reward)
 
 func _on_wave_result_closed() -> void:
 	_shop_ui.show_after_result()
@@ -139,6 +161,11 @@ func _spawn_wave(phase_index: int):
 		push_error("wave_configs の範囲外: " + str(phase_index))
 		return
 	var config = _wave_configs[phase_index]
+	# 全スポーン完了検知用カウンタを初期化
+	for group in config["groups"]:
+		_remaining_to_spawn += group["count"]
+	if _remaining_to_spawn == 0:
+		_all_enemies_spawned = true
 	for group in config["groups"]:
 		_spawn_group_delayed(group["scene"], group["count"], group["interval"],
 				group.get("start_delay", 0.0))
@@ -154,6 +181,9 @@ func _spawn_group(scene_path: String, count: int, interval: float):
 	var scene = load(scene_path)
 	if scene == null:
 		push_error("シーンが見つかりません: " + scene_path)
+		_remaining_to_spawn -= count
+		if _remaining_to_spawn <= 0:
+			_all_enemies_spawned = true
 		return
 	for i in range(count):
 		if GameManager.current_phase != GameManager.Phase.DEFENDING:
@@ -162,6 +192,9 @@ func _spawn_group(scene_path: String, count: int, interval: float):
 		units_node.add_child(enemy)
 		var spawn_node = spawners.get_children().pick_random()
 		enemy.global_position = spawn_node.global_position
+		_remaining_to_spawn -= 1
+		if _remaining_to_spawn <= 0:
+			_all_enemies_spawned = true
 		if i < count - 1:
 			await get_tree().create_timer(interval).timeout
 

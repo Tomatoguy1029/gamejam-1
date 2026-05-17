@@ -107,3 +107,13 @@ func buy_upgrade_atk_speed(group: String) -> bool:
 
 func get_phase_time_left() -> float:
 	return phase_timer.time_left
+
+func reset() -> void:
+	phase_timer.stop()
+	money            = CONFIG.initial_money
+	base_hp          = CONFIG.base_hp
+	wave_count       = 0
+	upgrade_atk      = 0
+	upgrade_hp       = 0
+	upgrade_atk_interval = 0.0
+	current_phase    = Phase.START

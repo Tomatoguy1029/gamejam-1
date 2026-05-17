@@ -33,10 +33,10 @@ func _update_target():
 		if gate_passable and global_position.y > (gate.global_position.y + 30 if gate else 99999):
 			_entered_inner = true
 
-	# 城壁内：本陣を目指しつつ、射程内の味方に反撃
+	# 城壁内：味方がいれば追う、いなければ本陣へ
 	if _entered_inner:
 		var nearest_ally = _find_nearest_ally()
-		if nearest_ally and global_position.distance_to(nearest_ally.global_position) <= attack_range:
+		if nearest_ally:
 			target = nearest_ally
 			return
 		target = get_tree().get_first_node_in_group("main_base")
@@ -73,7 +73,7 @@ func _find_nearest_gate() -> Node:
 func _find_nearest_ally() -> Node:
 	var allies = get_tree().get_nodes_in_group("allies")
 	var nearest = null
-	var nearest_dist = attack_range + 1.0
+	var nearest_dist = INF
 	for a in allies:
 		if not a.is_dead:
 			var d = global_position.distance_to(a.global_position)

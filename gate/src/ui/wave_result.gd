@@ -22,12 +22,16 @@ func _ready():
 	hide()
 
 ## survivors: { unit_id -> { "count": int, "reward": int } }
-func show_result(wave_num: int, survivors: Dictionary, total_reward: int) -> void:
+func show_result(wave_num: int, survivors: Dictionary, survivor_reward: int, clear_reward: int) -> void:
 	_title_label.text = "WAVE %d  CLEAR!" % wave_num
 
 	for child in _rows_box.get_children():
 		child.queue_free()
 
+	# WAVEクリア報酬
+	_add_row("WAVEクリア報酬", "", "+%dG" % clear_reward)
+
+	# 生存ユニット報酬
 	if survivors.is_empty():
 		_add_row("生存者なし", "", "")
 	else:
@@ -38,7 +42,8 @@ func show_result(wave_num: int, survivors: Dictionary, total_reward: int) -> voi
 			var rw: int          = data["reward"]
 			_add_row(uname, "%d体 × %dG" % [cnt, rw], "+%dG" % (cnt * rw))
 
-	_total_label.text = "生存ボーナス合計   +%dG" % total_reward
+	var grand_total: int = clear_reward + survivor_reward
+	_total_label.text = "合計   +%dG" % grand_total
 	show()
 
 func _add_row(label: String, rate: String, subtotal: String) -> void:

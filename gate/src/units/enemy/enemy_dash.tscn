@@ -9,7 +9,7 @@ size = Vector2(42, 41)
 [node name="EnemyDash" type="CharacterBody2D" unique_id=1772933990 groups=["enemies"]]
 scale = Vector2(1, 2)
 collision_layer = 4
-collision_mask = 27
+collision_mask = 31
 script = ExtResource("1_mwpar")
 unit_id = "enemy_dash"
 metadata/_edit_group_ = true
