@@ -11,12 +11,7 @@ func _ready():
 	GameManager.phase_changed.connect(_on_phase_changed)
 
 func _apply_upgrades():
-	damage       += GameManager.upgrade_atk
-	max_hp       += GameManager.upgrade_hp
-	attack_interval = max(
-		GameManager.CONFIG.min_attack_interval,
-		attack_interval - GameManager.upgrade_atk_interval
-	)
+	pass  # サバイバルモードではアップグレードなし
 
 func _logic(_delta):
 	if is_dead:
@@ -26,8 +21,6 @@ func _logic(_delta):
 		if global_position.distance_to(target.global_position) <= attack_range:
 			if can_attack:
 				_attack()
-		else:
-			_move(target.global_position)
 
 func _update_target():
 	var enemies = get_tree().get_nodes_in_group("enemies")
@@ -50,14 +43,5 @@ func _on_death():
 	hide()
 	set_physics_process(false)
 
-func _on_phase_changed(new_phase):
-	if new_phase == GameManager.Phase.PLACING and is_dead:
-		_revive()
-
-func _revive():
-	is_dead = false
-	current_hp = max_hp
-	global_position = home_position
-	show()
-	set_physics_process(true)
-	queue_redraw()
+func _on_phase_changed(_new_phase):
+	pass  # サバイバルモードでは蘇生なし

@@ -1,205 +1,278 @@
 extends Node
 
-const WAVE_CONFIG_PATH = "res://data/wave_configs.json"
+const ENEMY_HEAVY    = preload("res://src/units/enemy/enemy_heavy.tscn")
+const ENEMY_SWARM    = preload("res://src/units/enemy/enemy_swarm.tscn")
+const ENEMY_DASH     = preload("res://src/units/enemy/enemy_dash.tscn")
+const ENEMY_BREAKER  = preload("res://src/units/enemy/enemy_breaker.tscn")
+const ENEMY_SUMMONER = preload("res://src/units/enemy/enemy_summoner.tscn")
+
 const ALLY_ATTACKER = preload("res://src/units/ally/ally_attacker.tscn")
 const ALLY_TANK     = preload("res://src/units/ally/ally_tank.tscn")
 const ALLY_ARCHER   = preload("res://src/units/ally/ally_archer.tscn")
 
-# 0=攻撃兵, 1=守備兵, 2=弓兵
-var _place_type: int = 0
-# 占有済みアーチャースロット（Marker2D → unit）
-var _occupied_slots: Dictionary = {}
+const ALL_DIRS: Array[Vector2] = [
+	Vector2(0, -1),           # N
+	Vector2(0.707, -0.707),   # NE
+	Vector2(1, 0),            # E
+	Vector2(0.707, 0.707),    # SE
+	Vector2(0, 1),            # S
+	Vector2(-0.707, 0.707),   # SW
+	Vector2(-1, 0),           # W
+	Vector2(-0.707, -0.707),  # NW
+]
 
-var _wave_configs: Array = []
+@onready var units_node: Node2D = $World/Units
+@onready var _result_overlay    = $ResultOverlay
 
-# 敵全滅検知用
-var _all_enemies_spawned: bool = false
-var _remaining_to_spawn:  int  = 0
+var _elapsed: float = 0.0
 
-@onready var units_node: Node2D   = $World/Units
-@onready var spawners: Node2D     = $World/Spawners
-@onready var archer_slots: Node2D = $World/NavigationRegion2D/ArcherSlots
-@onready var _wave_result         = $CanvasLayer/WaveResult
-@onready var _shop_ui             = $CanvasLayer/ShopUI
+# ウェーブタイマー（負の値 = 最初の発火まで待つ時間）
+var _col_timer:      float = 3.0    # Wave1: 2秒後に最初の列（閾値5.0まで2秒）
+var _cls_timer:      float = -5.0   # Wave2
+var _mix_col_timer:  float = -4.0   # Wave3 列側
+var _mix_cls_timer:  float = -6.0   # Wave3 塊側（少しずらす）
+var _spl_main_timer: float = -4.0   # Wave4 主戦線
+var _spl_flank_timer:float = -7.0   # Wave4 側面（主戦線から遅れて）
+var _chaos_timer:    float = -3.0   # Wave5
+
+var _prev_wave: int = 0
+var _last_col_dir: Vector2 = Vector2.ZERO   # 連続で同じ方向にならないよう記録
+var _last_cls_dir: Vector2 = Vector2.ZERO
+
+func _wave_id_at(t: float) -> int:
+	if t < 12.0: return 1
+	if t < 24.0: return 2
+	if t < 36.0: return 3
+	if t < 50.0: return 4
+	return 5
 
 func _ready():
-	_load_wave_configs()
+	randomize()
 	GameManager.phase_changed.connect(_on_phase_changed)
 	GameManager.game_over.connect(_on_game_over)
-	_wave_result.next_pressed.connect(_on_wave_result_closed)
+	_result_overlay.hide()
 
-func _load_wave_configs():
-	var file = FileAccess.open(WAVE_CONFIG_PATH, FileAccess.READ)
-	if file == null:
-		push_error("wave_configs.json が見つかりません: " + WAVE_CONFIG_PATH)
+func _process(delta):
+	if GameManager.current_phase != GameManager.Phase.PLAYING:
 		return
-	var json = JSON.new()
-	if json.parse(file.get_as_text()) != OK:
-		push_error("wave_configs.json のパース失敗: " + json.get_error_message())
-		return
-	_wave_configs = json.get_data()
+	_elapsed += delta
 
-func _process(_delta):
-	if GameManager.current_phase == GameManager.Phase.DEFENDING \
-			and _all_enemies_spawned \
-			and get_tree().get_nodes_in_group("enemies").is_empty():
-		GameManager.start_placing_phase()
+	var wave = _wave_id_at(_elapsed)
+	if wave != _prev_wave:
+		_on_wave_enter(wave)
+		_prev_wave = wave
+
+	match wave:
+		1: _wave1(delta)
+		2: _wave2(delta)
+		3: _wave3(delta)
+		4: _wave4(delta)
+		5: _wave5(delta)
+
+func _on_wave_enter(wave: int) -> void:
+	# 新しいウェーブに入ったときタイマーリセット（少し待ってから始まる）
+	match wave:
+		2:
+			_cls_timer = -2.0    # wave2突入後2秒で最初の塊
+		3:
+			_mix_col_timer = -3.0
+			_mix_cls_timer = -4.5   # 列より1.5秒遅らせて塊を導入
+		4:
+			_spl_main_timer  = -3.0
+			_spl_flank_timer = -4.5  # 主戦線より1.5秒遅らせて側面
+		5:
+			_chaos_timer = -3.0
+
+# ════════════════════════════════════════════════════════
+# Wave 1 (0-12s) — 縦列入門
+# ════════════════════════════════════════════════════════
+func _wave1(delta: float) -> void:
+	_col_timer += delta
+	if _col_timer >= 4.5:
+		_col_timer = 0.0
+		var dir = _random_dir_excluding(_last_col_dir)
+		_last_col_dir = dir
+		_spawn_line(dir, 5, 50.0, ENEMY_SWARM)
+
+# ════════════════════════════════════════════════════════
+# Wave 2 (12-24s) — 塊入門
+# ════════════════════════════════════════════════════════
+func _wave2(delta: float) -> void:
+	_cls_timer += delta
+	if _cls_timer >= 4.0:
+		_cls_timer = 0.0
+		var dir = _random_dir_excluding(_last_cls_dir)
+		_last_cls_dir = dir
+		_spawn_cluster(dir, 10, 32.0, ENEMY_SWARM)
+		_spawn_cluster(dir,  3, 20.0, ENEMY_HEAVY, 0.6)
+
+# ════════════════════════════════════════════════════════
+# Wave 3 (24-36s) — 混合
+# ════════════════════════════════════════════════════════
+func _wave3(delta: float) -> void:
+	_mix_col_timer += delta
+	if _mix_col_timer >= 3.5:
+		_mix_col_timer = 0.0
+		var dir = _random_dir_excluding(_last_col_dir)
+		_last_col_dir = dir
+		_spawn_line(dir, 9, 44.0, ENEMY_SWARM)
+		_spawn_line(dir, 3, 66.0, ENEMY_BREAKER, 0.6)
+
+	_mix_cls_timer += delta
+	if _mix_cls_timer >= 5.0:
+		_mix_cls_timer = 0.0
+		var dir2 = _opposite_dir(_last_col_dir)
+		_last_cls_dir = dir2
+		_spawn_cluster(dir2, 9, 30.0, ENEMY_SWARM)
+		_spawn_cluster(dir2, 4, 20.0, ENEMY_HEAVY)
+
+# ════════════════════════════════════════════════════════
+# Wave 4 (36-50s) — 挟撃 (Wind/Rain向け)
+# ════════════════════════════════════════════════════════
+func _wave4(delta: float) -> void:
+	# 主戦線
+	_spl_main_timer += delta
+	if _spl_main_timer >= 3.5:
+		_spl_main_timer = 0.0
+		var main_dir = _random_dir_excluding(_last_col_dir)
+		_last_col_dir = main_dir
+		_spawn_line(main_dir, 8, 50.0, ENEMY_HEAVY)
+		_spawn_line(main_dir, 3, 72.0, ENEMY_BREAKER, 0.5)
+
+	# 側面: 主戦線と90°ずれた方向からDash高速部隊
+	_spl_flank_timer += delta
+	if _spl_flank_timer >= 4.0:
+		_spl_flank_timer = 0.0
+		var flank_dir = _perpendicular_dir(_last_col_dir)
+		_last_cls_dir = flank_dir
+		_spawn_cluster(flank_dir, 8, 38.0, ENEMY_DASH)
+		_spawn_cluster(flank_dir, 4, 24.0, ENEMY_SWARM, 0.3)
+
+# ════════════════════════════════════════════════════════
+# Wave 5 (50-60s) — 全方位カオス
+# ════════════════════════════════════════════════════════
+func _wave5(delta: float) -> void:
+	_chaos_timer += delta
+	# 徐々に間隔短縮
+	var interval = lerp(2.8, 1.7, clampf((_elapsed - 50.0) / 10.0, 0.0, 1.0))
+	if _chaos_timer >= interval:
+		_chaos_timer = 0.0
+		var dir = _random_dir_excluding(_last_col_dir)
+		_last_col_dir = dir
+		match randi() % 4:
+			0:  # 縦列 + Summoner
+				_spawn_line(dir, 8, 42.0, ENEMY_SWARM)
+				_spawn_single(_random_dir_excluding(dir), ENEMY_SUMMONER)
+			1:  # 密集Heavy
+				_spawn_cluster(dir, 11, 35.0, ENEMY_HEAVY)
+			2:  # 2方向同時Dash
+				var dir2 = _perpendicular_dir(dir)
+				_spawn_cluster(dir,  5, 28.0, ENEMY_DASH)
+				_spawn_cluster(dir2, 5, 28.0, ENEMY_DASH)
+			3:  # 列 + 反対から塊
+				_spawn_line(_perpendicular_dir(dir), 7, 48.0, ENEMY_SWARM)
+				_spawn_cluster(dir, 7, 30.0, ENEMY_HEAVY)
+
+# ════════════════════════════════════════════════════════
+# 方向ユーティリティ
+# ════════════════════════════════════════════════════════
+func _random_dir_excluding(exclude: Vector2) -> Vector2:
+	var tries = 0
+	while tries < 10:
+		var d: Vector2 = ALL_DIRS[randi() % ALL_DIRS.size()]
+		if d != exclude:
+			return d
+		tries += 1
+	return ALL_DIRS[randi() % ALL_DIRS.size()]
+
+# 与えられた方向に対してほぼ垂直な方向を返す（挟み撃ち用）
+func _perpendicular_dir(dir: Vector2) -> Vector2:
+	var idx = ALL_DIRS.find(dir)
+	if idx < 0:
+		idx = 0
+	# 90°ずらす（2ステップ）、さらにランダムに+/-
+	var offset = 2 if randi() % 2 == 0 else -2
+	return ALL_DIRS[(idx + offset + ALL_DIRS.size()) % ALL_DIRS.size()]
+
+# 反対方向
+func _opposite_dir(dir: Vector2) -> Vector2:
+	var idx = ALL_DIRS.find(dir)
+	if idx < 0: return ALL_DIRS[0]
+	return ALL_DIRS[(idx + 4) % ALL_DIRS.size()]
+
+# ════════════════════════════════════════════════════════
+# スポーンユーティリティ
+# ════════════════════════════════════════════════════════
+func _spawn_line(dir: Vector2, count: int, spacing: float,
+		scene: PackedScene, delay: float = 0.0) -> void:
+	var castle = get_tree().get_first_node_in_group("main_base")
+	if not castle: return
+	var base = castle.global_position + dir * GameManager.CONFIG.spawn_distance
+	var perp = Vector2(-dir.y, dir.x)
+	for i in count:
+		var offset = perp * (i - (count - 1) * 0.5) * spacing
+		var pos    = base + offset + Vector2(randf_range(-8, 8), randf_range(-8, 8))
+		if delay > 0.0:
+			get_tree().create_timer(delay + i * 0.05).timeout.connect(
+				func(): _do_spawn(scene, pos))
+		else:
+			_do_spawn(scene, pos)
+
+func _spawn_cluster(dir: Vector2, count: int, radius: float,
+		scene: PackedScene, delay: float = 0.0) -> void:
+	var castle = get_tree().get_first_node_in_group("main_base")
+	if not castle: return
+	var center = castle.global_position + dir * GameManager.CONFIG.spawn_distance
+	for i in count:
+		var ang = randf() * TAU
+		var pos = center + Vector2(cos(ang), sin(ang)) * randf_range(0.0, radius)
+		if delay > 0.0:
+			get_tree().create_timer(delay + i * 0.06).timeout.connect(
+				func(): _do_spawn(scene, pos))
+		else:
+			_do_spawn(scene, pos)
+
+func _spawn_single(dir: Vector2, scene: PackedScene) -> void:
+	var castle = get_tree().get_first_node_in_group("main_base")
+	if not castle: return
+	_do_spawn(scene, castle.global_position + dir * GameManager.CONFIG.spawn_distance)
+
+func _do_spawn(scene: PackedScene, pos: Vector2) -> void:
+	if GameManager.current_phase != GameManager.Phase.PLAYING:
+		return
+	var enemy = scene.instantiate()
+	units_node.add_child(enemy)
+	enemy.global_position = pos
+
+# ════════════════════════════════════════════════════════
+# その他
+# ════════════════════════════════════════════════════════
+func _on_phase_changed(new_phase):
+	if new_phase == GameManager.Phase.PLAYING:
+		_place_initial_defenders()
+
+func _place_initial_defenders():
+	var castle = get_tree().get_first_node_in_group("main_base")
+	if castle == null:
+		return
+	var base  = castle.global_position
+	var spots = [
+		base + Vector2(-60,  0),
+		base + Vector2( 60,  0),
+		base + Vector2(  0, -60),
+		base + Vector2(-40, -80),
+		base + Vector2( 40, -80),
+	]
+	var scenes = [ALLY_TANK, ALLY_TANK, ALLY_ATTACKER, ALLY_ARCHER, ALLY_ARCHER]
+	for i in scenes.size():
+		var u = scenes[i].instantiate()
+		units_node.add_child(u)
+		u.global_position = spots[i]
+
+func _on_game_over(is_win: bool) -> void:
+	_result_overlay.show_result(is_win)
 
 func _input(event):
-	# ESC でタイトルに戻る（任意フェーズ）
 	if event.is_action_pressed("ui_cancel"):
-		_return_to_title()
-		return
-
-	if GameManager.current_phase != GameManager.Phase.PLACING:
-		return
-
-	if event.is_action_pressed("ui_accept"):
-		GameManager.start_defending_phase()
-		return
-
-	if event is InputEventKey and event.pressed and not event.echo:
-		match event.keycode:
-			KEY_1: _place_type = 0
-			KEY_2: _place_type = 1
-			KEY_3: _place_type = 2
-		return
-
-	if event is InputEventMouseButton and event.pressed \
-			and event.button_index == MOUSE_BUTTON_LEFT:
-		_try_place_unit(units_node.get_global_mouse_position())
-
-func _try_place_unit(world_pos: Vector2):
-	var type_ids = ["ally_attacker", "ally_tank", "ally_archer"]
-	var p = GameManager.UNIT_CONFIG.get(type_ids[_place_type])
-	if p == null:
-		return
-
-	if _place_type == 2:
-		# 弓兵：空きスロットへスナップ配置
-		var slot = _find_free_slot()
-		if slot == null:
-			print("弓兵スロットが全て埋まっています")
-			return
-		if not GameManager.spend_money(p.cost):
-			print("お金が足りません (%dG 必要)" % p.cost)
-			return
-		var unit = ALLY_ARCHER.instantiate()
-		units_node.add_child(unit)
-		unit.global_position = slot.global_position
-		_occupied_slots[slot] = unit
-	else:
-		# 歩兵・守備兵：内陣エリア内にクリック配置
-		var bounds = GameManager.CONFIG.placement_bounds
-		if not bounds.has_point(world_pos):
-			return
-		if not GameManager.spend_money(p.cost):
-			print("お金が足りません (%dG 必要)" % p.cost)
-			return
-		var scene = ALLY_ATTACKER if _place_type == 0 else ALLY_TANK
-		var unit = scene.instantiate()
-		units_node.add_child(unit)
-		unit.global_position = world_pos
-
-## 空きアーチャースロット（Marker2D）を返す。全埋まりなら null
-func _find_free_slot() -> Marker2D:
-	for slot in archer_slots.get_children():
-		if slot is Marker2D:
-			var occupant = _occupied_slots.get(slot)
-			if occupant == null or not is_instance_valid(occupant):
-				return slot
-	return null
-
-func _return_to_title() -> void:
-	GameManager.reset()
-	get_tree().reload_current_scene()
-
-func _on_phase_changed(new_phase):
-	if new_phase == GameManager.Phase.DEFENDING:
-		_all_enemies_spawned = false
-		_remaining_to_spawn  = 0
-		_spawn_wave(GameManager.wave_count - 1)
-	elif new_phase == GameManager.Phase.PLACING:
-		# 敵を全て削除
-		for enemy in get_tree().get_nodes_in_group("enemies"):
-			enemy.queue_free()
-		# wave クリア後（初回配置フェーズ以外）にリザルトを表示
-		if GameManager.wave_count > 0:
-			_show_wave_result()
-
-func _show_wave_result() -> void:
-	# 生存している味方ユニットを集計
-	var survivors: Dictionary = {}   # { unit_id -> { count, reward } }
-	var total_reward: int = 0
-	for ally in get_tree().get_nodes_in_group("allies"):
-		if ally.has_method("take_damage") and not ally.is_dead:
-			var uid: String = ally.unit_id
-			var rw: int     = ally.reward
-			if uid not in survivors:
-				survivors[uid] = { "count": 0, "reward": rw }
-			survivors[uid]["count"] += 1
-			total_reward += rw
-
-	# 報酬を money に追加
-	if total_reward > 0:
-		GameManager.add_money(total_reward)
-
-	# 生存ユニットを全て削除（リセット）
-	for ally in get_tree().get_nodes_in_group("allies"):
-		ally.queue_free()
-	_occupied_slots.clear()
-
-	# リザルト画面を表示（waveクリア報酬は GameManager が自動付与）
-	_wave_result.show_result(GameManager.wave_count, survivors, total_reward,
-			GameManager.CONFIG.phase_clear_reward)
-
-func _on_wave_result_closed() -> void:
-	_shop_ui.show_after_result()
-
-func _spawn_wave(phase_index: int):
-	if phase_index < 0 or phase_index >= _wave_configs.size():
-		push_error("wave_configs の範囲外: " + str(phase_index))
-		return
-	var config = _wave_configs[phase_index]
-	# 全スポーン完了検知用カウンタを初期化
-	for group in config["groups"]:
-		_remaining_to_spawn += group["count"]
-	if _remaining_to_spawn == 0:
-		_all_enemies_spawned = true
-	for group in config["groups"]:
-		_spawn_group_delayed(group["scene"], group["count"], group["interval"],
-				group.get("start_delay", 0.0))
-
-func _spawn_group_delayed(scene_path: String, count: int, interval: float, delay: float):
-	if delay > 0.0:
-		await get_tree().create_timer(delay).timeout
-	if GameManager.current_phase != GameManager.Phase.DEFENDING:
-		return
-	await _spawn_group(scene_path, count, interval)
-
-func _spawn_group(scene_path: String, count: int, interval: float):
-	var scene = load(scene_path)
-	if scene == null:
-		push_error("シーンが見つかりません: " + scene_path)
-		_remaining_to_spawn -= count
-		if _remaining_to_spawn <= 0:
-			_all_enemies_spawned = true
-		return
-	for i in range(count):
-		if GameManager.current_phase != GameManager.Phase.DEFENDING:
-			return
-		var enemy = scene.instantiate()
-		units_node.add_child(enemy)
-		var spawn_node = spawners.get_children().pick_random()
-		enemy.global_position = spawn_node.global_position
-		_remaining_to_spawn -= 1
-		if _remaining_to_spawn <= 0:
-			_all_enemies_spawned = true
-		if i < count - 1:
-			await get_tree().create_timer(interval).timeout
-
-func _on_game_over(is_win: bool):
-	if is_win:
-		print("クリア！")
-	else:
-		print("敗北…")
+		GameManager.reset()
+		get_tree().reload_current_scene()

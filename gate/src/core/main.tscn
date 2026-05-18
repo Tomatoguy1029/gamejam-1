@@ -3,11 +3,10 @@
 [ext_resource type="Script" uid="uid://c3rmw17sqx7me" path="res://src/core/main.gd" id="1_w61mg"]
 [ext_resource type="PackedScene" uid="uid://cqgpocp6kledv" path="res://src/core/game_manager.tscn" id="1_x62ka"]
 [ext_resource type="PackedScene" uid="uid://ci2by6m8xpkxe" path="res://src/core/world.tscn" id="2_w61mg"]
-[ext_resource type="PackedScene" uid="uid://ckum0c5kmghti" path="res://src/ui/shop.tscn" id="3_q2b63"]
 [ext_resource type="PackedScene" uid="uid://i4nfn4ik2rco" path="res://src/ui/hud.tscn" id="4_nxx65"]
 [ext_resource type="PackedScene" uid="uid://start_scr001" path="res://src/ui/start_screen.tscn" id="5_ss"]
-[ext_resource type="PackedScene" uid="uid://phase_msg001" path="res://src/ui/phase_message.tscn" id="6_pm"]
-[ext_resource type="PackedScene" uid="uid://waveresult01" path="res://src/ui/wave_result.tscn" id="7_wr"]
+[ext_resource type="Script" uid="uid://godpwr001" path="res://src/powers/god_power_manager.gd" id="8_gpm"]
+[ext_resource type="PackedScene" uid="uid://resultov_scn1" path="res://src/ui/result_overlay.tscn" id="9_ro"]
 
 [node name="Main" type="Node" unique_id=1984561391]
 script = ExtResource("1_w61mg")
@@ -16,14 +15,13 @@ script = ExtResource("1_w61mg")
 
 [node name="World" parent="." unique_id=720116892 instance=ExtResource("2_w61mg")]
 
+[node name="GodPowerManager" type="Node2D" parent="." groups=["god_power_manager"] unique_id=800000001]
+script = ExtResource("8_gpm")
+
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=587740060]
 
 [node name="HUD" parent="CanvasLayer" unique_id=609254971 instance=ExtResource("4_nxx65")]
 
-[node name="ShopUI" parent="CanvasLayer" unique_id=683593402 instance=ExtResource("3_q2b63")]
-
-[node name="PhaseMessage" parent="CanvasLayer" unique_id=500000001 instance=ExtResource("6_pm")]
-
 [node name="StartScreen" parent="CanvasLayer" unique_id=500000002 instance=ExtResource("5_ss")]
 
-[node name="WaveResult" parent="CanvasLayer" unique_id=700100001 instance=ExtResource("7_wr")]
+[node name="ResultOverlay" parent="." unique_id=900000001 instance=ExtResource("9_ro")]

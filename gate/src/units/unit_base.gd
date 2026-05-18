@@ -66,7 +66,7 @@ func _draw():
 	draw_rect(Rect2(bx, _BAR_Y, bar_w * ratio, _BAR_HEIGHT), bar_color)
 
 func _physics_process(_delta):
-	if GameManager.current_phase != GameManager.Phase.DEFENDING:
+	if GameManager.current_phase != GameManager.Phase.PLAYING:
 		return
 	_logic(_delta)
 

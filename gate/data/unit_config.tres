@@ -39,6 +39,7 @@ reward = 15
 script = ExtResource("2")
 max_hp = 80
 speed = 70.0
+damage = 12
 attack_range = 50.0
 attack_interval = 3.0
 reward = 15
@@ -48,6 +49,7 @@ gate_damage_multiplier = 3.0
 script = ExtResource("2")
 max_hp = 70
 speed = 180.0
+damage = 12
 attack_interval = 0.8
 reward = 6
 
@@ -55,7 +57,7 @@ reward = 6
 script = ExtResource("2")
 max_hp = 200
 speed = 50.0
-damage = 20
+damage = 24
 attack_range = 50.0
 attack_interval = 2.0
 reward = 10
@@ -73,8 +75,8 @@ reward = 20
 script = ExtResource("2")
 max_hp = 25
 speed = 150.0
-damage = 5
-attack_interval = 0.5
+damage = 3
+attack_interval = 0.8
 reward = 3
 
 [resource]

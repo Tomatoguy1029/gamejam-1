@@ -44,13 +44,13 @@ theme_override_constants/separation = 24
 [node name="TitleLabel" type="Label" parent="VBox" unique_id=300000004]
 layout_mode = 2
 theme_override_font_sizes/font_size = 72
-text = "GATE"
+text = ""
 horizontal_alignment = 1
 
 [node name="SubLabel" type="Label" parent="VBox" unique_id=300000005]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Push SPACE to Control the gate"
+text = ""
 horizontal_alignment = 1
 
 [node name="StartButton" type="Button" parent="VBox" unique_id=300000006]

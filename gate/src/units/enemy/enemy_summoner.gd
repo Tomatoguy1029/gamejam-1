@@ -46,7 +46,7 @@ func _logic(_delta):
 		_move(gate_pos - to_gate.normalized() * stop_dist_from_gate)
 
 func _on_summon_timer_timeout():
-	if swarm_scene == null or GameManager.current_phase != GameManager.Phase.DEFENDING:
+	if swarm_scene == null or GameManager.current_phase != GameManager.Phase.PLAYING:
 		return
 	for i in range(summon_count):
 		var s = swarm_scene.instantiate()
